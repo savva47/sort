@@ -44,7 +44,9 @@ int main()
 		}
 	}
 
+	// сортировка
 	map<string, size_t> words(unordered_words.begin(), unordered_words.end());
+
 	// вывод
 	ofstream fout("out.txt");
 	if (!fout.is_open()) return 1;
