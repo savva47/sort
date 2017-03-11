@@ -12,9 +12,7 @@ int main()
 	ifstream fin("in.txt");
 	string word;
 	unordered_map<string, size_t> unordered_words;
-	
-	map<size_t, bool> count;
-	size_t max = 0;
+	unordered_map<size_t, bool> unordered_count;
 
 	// ввод
 	if (!fin.is_open()) return 1;
@@ -37,29 +35,25 @@ int main()
 	// поиск максимума
 	for (auto it = unordered_words.begin(); it != unordered_words.end(); ++it)
 	{
-		count[(*it).second] = true;
-		if ((*it).second > max)
-		{
-			max = (*it).second;
-		}
+		unordered_count[(*it).second] = true;
 	}
 
 	// сортировка
 	map<string, size_t> words(unordered_words.begin(), unordered_words.end());
+	map<size_t, bool> count(unordered_count.begin(), unordered_count.end());
 
 	// вывод
 	ofstream fout("out.txt");
 	if (!fout.is_open()) return 1;
-	while (max != 0)
+	for (auto itc = --count.end(); itc != --count.begin(); --itc)
 	{
-		if (count[max])
+		if ((*itc).second)
 		{
 			for (auto it = words.begin(); it != words.end(); ++it)
 			{
-				if ((*it).second == max) fout << (*it).first << " : " << (*it).second << endl;
+				if ((*it).second == (*itc).first) fout << (*it).first << " : " << (*it).second << endl;
 			}
 		}
-	--max;
 	}
 	fout.close();
 
