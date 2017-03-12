@@ -1,9 +1,7 @@
-#include <iostream>
 #include <string>
 #include <map>
-#include <unordered_map>
-#include <algorithm>
 #include <fstream>
+#include <set>
 
 using namespace std;
 
@@ -11,10 +9,10 @@ int main()
 {
 	ifstream fin("in.txt");
 	string word;
-	unordered_map<string, size_t> unordered_words;
-	unordered_map<size_t, bool> unordered_count;
+	map<string, size_t> words;
+	set<size_t> count;
 
-	// ввод
+	// input
 	if (!fin.is_open()) return 1;
 	while (fin >> word)
 	{
@@ -28,31 +26,24 @@ int main()
 			}
 			if ((word[i] >= 65) && (word[i] <= 90)) word[i] += 32;
 		}
-		++unordered_words[word];
+		++words[word];
 	}
 	fin.close();
 
-	// поиск максимума
-	for (auto it = unordered_words.begin(); it != unordered_words.end(); ++it)
+	// search max
+	for (auto it = words.begin(); it != words.end(); ++it)
 	{
-		unordered_count[(*it).second] = true;
+		count.insert(it->second);
 	}
 
-	// сортировка
-	map<string, size_t> words(unordered_words.begin(), unordered_words.end());
-	map<size_t, bool> count(unordered_count.begin(), unordered_count.end());
-
-	// вывод
+	// output
 	ofstream fout("out.txt");
 	if (!fout.is_open()) return 1;
-	for (auto itc = --count.end(); itc != --count.begin(); --itc)
+	for (auto itc = count.rbegin(); itc != count.rend(); ++itc)
 	{
-		if ((*itc).second)
+		for (auto it = words.begin(); it != words.end(); ++it)
 		{
-			for (auto it = words.begin(); it != words.end(); ++it)
-			{
-				if ((*it).second == (*itc).first) fout << (*it).first << " : " << (*it).second << endl;
-			}
+			if (it->second == *itc) fout << it->first << " : " << it->second << endl;
 		}
 	}
 	fout.close();
