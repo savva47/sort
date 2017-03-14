@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <unordered_map>
 #include <fstream>
 #include <set>
 #include <vector>
@@ -9,12 +8,54 @@
 
 using namespace std;
 
+struct bohr_vrtx {
+	int next_vrtx[26], pat_num;
+	bool flag;
+};
+
+vector<bohr_vrtx> bohr;
+vector<pair<string, unsigned>> pattern_count;
+
+bohr_vrtx make_bohr_vrtx() {
+	bohr_vrtx v;
+	memset(v.next_vrtx, 255, sizeof(v.next_vrtx));
+	v.flag = false;
+	return v;
+}
+void bohr_ini() {
+	bohr.push_back(make_bohr_vrtx());
+}
+
+void check_string_in_bohr_else_add(const string& s) {
+	int num = 0;
+	for (int i = 0; i < s.length(); i++)
+	{
+		char ch = s[i] - 'a';
+		if (bohr[num].next_vrtx[ch] == -1)
+		{
+			bohr.push_back(make_bohr_vrtx());
+			bohr[num].next_vrtx[ch] = bohr.size() - 1;
+		}
+		num = bohr[num].next_vrtx[ch];
+	}
+	if (bohr[num].flag)
+	{
+		++pattern_count[bohr[num].pat_num].second;
+	}
+	else
+	{
+		bohr[num].flag = true;
+		pattern_count.push_back(make_pair(s, 1u));
+		bohr[num].pat_num = pattern_count.size() - 1;
+	}
+}
+
 int main()
 {
 	ifstream fin("in.txt");
 	string word;
-	unordered_map<string, size_t> words;
-	set<size_t> count;
+	bohr_ini();
+	set<unsigned> count;
 
 	// input
 	size_t start_time = clock();
@@ -31,23 +72,23 @@ int main()
 			}
 			if ((word[i] >= 65) && (word[i] <= 90)) word[i] += 32;
 		}
-		++words[word];
+		check_string_in_bohr_else_add(word);
+
 	}
 	fin.close();
 	cout << "input - " << clock() - start_time << endl;
 
 	// search max
 	start_time = clock();
-	for (auto it = words.begin(); it != words.end(); ++it)
+	for (auto it = pattern_count.begin(); it != pattern_count.end(); ++it)
 	{
 		count.insert(it->second);
 	}
 	cout << "search max - " << clock() - start_time << endl;
-
 	// sort
 	start_time = clock();
-	vector<pair<const string*, const size_t*>> elems;
-	for (auto it = words.begin(); it != words.end(); ++it)
+	vector<pair<const string*, const unsigned*>> elems;
+	for (auto it = pattern_count.begin(); it != pattern_count.end(); ++it)
 	{
 		elems.push_back(make_pair(&it->first, &it->second));
 	}
